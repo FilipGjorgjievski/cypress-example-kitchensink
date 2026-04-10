@@ -6,11 +6,13 @@ import { step } from "allure-js-commons";
 export class TodoPage extends BasePage {
   private readonly newTodoInput: Locator;
   private readonly todoItems: Locator;
+  private readonly todoCounter: Locator;
 
   constructor(page: Page) {
     super(page);
     this.newTodoInput = this.page.locator('[data-test="new-todo"]');
     this.todoItems = this.page.locator(".todo-list").getByRole("listitem");
+    this.todoCounter = this.page.locator(".todo-count");
   }
 
   async open(): Promise<void> {
@@ -54,5 +56,11 @@ export class TodoPage extends BasePage {
         await expect(this.todoItems).toHaveCount(count);
       },
     );
+  }
+
+  async expectCounterText(text: string) {
+    await step(`Then the counter should show "${text}"`, async () => {
+      await expect(this.todoCounter).toHaveText(text);
+    });
   }
 }
