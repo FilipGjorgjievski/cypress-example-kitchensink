@@ -9,6 +9,9 @@ export class TodoPage extends BasePage {
   private readonly todoCounter: Locator;
   private readonly toggleAllButton: Locator;
   private readonly clearCompletedButton: Locator;
+  private readonly filterAll: Locator;
+  private readonly filterActive: Locator;
+  private readonly filterCompleted: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -19,9 +22,12 @@ export class TodoPage extends BasePage {
     this.clearCompletedButton = this.page.getByRole("button", {
       name: "Clear completed",
     });
+    this.filterAll = this.page.getByRole("link", { name: "All" });
+    this.filterActive = this.page.getByRole("link", { name: "Active" });
+    this.filterCompleted = this.page.getByRole("link", { name: "Completed" });
   }
 
-  async open(): Promise<void> {
+  async open() {
     await this.navigateTo(todoPath);
   }
 
@@ -166,6 +172,24 @@ export class TodoPage extends BasePage {
   async clearCompleted() {
     await step("When the user clicks 'Clear completed'", async () => {
       await this.clearCompletedButton.click();
+    });
+  }
+
+  async clickFilterActive() {
+    await step("When the user clicks the 'Active' filer", async () => {
+      await this.filterActive.click();
+    });
+  }
+
+  async clickFilterCompleted() {
+    await step("When the user clicks the 'Completed' filter", async () => {
+      await this.filterCompleted.click();
+    });
+  }
+
+  async clickFilterAll() {
+    await step("When the user clicks the 'All' filter", async () => {
+      await this.filterAll.click();
     });
   }
 }
