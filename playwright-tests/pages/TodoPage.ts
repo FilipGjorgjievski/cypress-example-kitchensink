@@ -8,6 +8,7 @@ export class TodoPage extends BasePage {
   private readonly todoItems: Locator;
   private readonly todoCounter: Locator;
   private readonly toggleAllButton: Locator;
+  private readonly clearCompletedButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -15,6 +16,9 @@ export class TodoPage extends BasePage {
     this.todoItems = this.page.locator(".todo-list").getByRole("listitem");
     this.todoCounter = this.page.locator(".todo-count");
     this.toggleAllButton = this.page.getByText("Mark all as complete");
+    this.clearCompletedButton = this.page.getByRole("button", {
+      name: "Clear completed",
+    });
   }
 
   async open(): Promise<void> {
@@ -136,5 +140,32 @@ export class TodoPage extends BasePage {
           .press("Enter");
       },
     );
+  }
+
+  async deleteTask(taskName: string) {
+    await step(`When the user deletes the task "${taskName}"`, async () => {
+      await this.todoItems.filter({ hasText: taskName }).hover();
+      await this.todoItems
+        .filter({ hasText: taskName })
+        .getByRole("button")
+        .click();
+    });
+  }
+
+  async expectTaskNotVisible(taskName: string) {
+    await step(
+      `Then the task "${taskName}" should no longer appear in the list`,
+      async () => {
+        await expect(this.todoItems.filter({ hasText: taskName })).toHaveCount(
+          0,
+        );
+      },
+    );
+  }
+
+  async clearCompleted() {
+    await step("When the user clicks 'Clear completed'", async () => {
+      await this.clearCompletedButton.click();
+    });
   }
 }
