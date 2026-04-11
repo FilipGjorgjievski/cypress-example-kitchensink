@@ -1,19 +1,29 @@
 import { test } from "../fixtures/fixtures";
 import { multipleTasks } from "playwright-tests/utils/testData";
+import { epic, feature, story, Severity, severity } from "allure-js-commons";
 
-test.describe("ToDO App - Update Tasks", () => {
+test.describe("ToDo App - Update Tasks", () => {
+  test.beforeEach(async () => {
+    await epic("ToDo Application");
+    await feature("Task Update");
+  });
+
+  // Nested describe groups tests that share the same single-task precondition
   test.describe("single task operations", () => {
-    // Shared precondition: all tests in this group operate on one existing task
     test.beforeEach(async ({ todoPageCleanState }) => {
       await todoPageCleanState.addTask("Fix the flux capacitor");
     });
 
     test("Mark a task as completed", async ({ todoPageCleanState }) => {
+      await severity(Severity.CRITICAL);
+
       await todoPageCleanState.checkTask("Fix the flux capacitor");
       await todoPageCleanState.expectTaskCompleted("Fix the flux capacitor");
     });
 
     test("Unmark a completed task", async ({ todoPageCleanState }) => {
+      await severity(Severity.CRITICAL);
+
       // Step 1 — mark as completed and verify
       await todoPageCleanState.checkTask("Fix the flux capacitor");
       await todoPageCleanState.expectTaskCompleted("Fix the flux capacitor");
@@ -24,6 +34,8 @@ test.describe("ToDO App - Update Tasks", () => {
     });
 
     test("Edit an existing task", async ({ todoPageCleanState }) => {
+      await severity(Severity.CRITICAL);
+
       await todoPageCleanState.editTask(
         "Fix the flux capacitor",
         "Replace the flux capacitor",
@@ -33,6 +45,11 @@ test.describe("ToDO App - Update Tasks", () => {
   });
 
   test("Mark all tasks as completed", async ({ todoPageCleanState }) => {
+    await severity(Severity.NORMAL);
+
+    await epic("ToDo Application");
+    await feature("Task Update");
+
     await todoPageCleanState.addMultipleTasks(multipleTasks);
     await todoPageCleanState.markAllCompleted();
     await todoPageCleanState.expectAllTasksCompleted();

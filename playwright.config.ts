@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: './playwright-tests/tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1,
   workers: process.env.CI ? 1 : undefined,
 
   // Allure reporter for step definitions and HTML report generation
@@ -21,6 +21,7 @@ export default defineConfig({
     baseURL: 'http://localhost:8080',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    video: 'retain-on-failure'
   },
 
   projects: [

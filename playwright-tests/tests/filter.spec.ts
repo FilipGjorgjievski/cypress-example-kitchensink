@@ -1,14 +1,20 @@
 import { test } from "../fixtures/fixtures";
 import { multipleTasks } from "playwright-tests/utils/testData";
+import { epic, feature, Severity, severity } from "allure-js-commons";
 
 test.describe("ToDo App - Filter Tasks", () => {
   test.beforeEach(async ({ todoPageCleanState }) => {
+    epic("ToDo Application");
+    feature("Task Filtering");
+
     // Setup: add tasks and mark the first one as completed
     await todoPageCleanState.addMultipleTasks(multipleTasks);
     await todoPageCleanState.checkTask(multipleTasks[0]);
   });
 
   test("Filter by Active tasks", async ({ todoPageCleanState }) => {
+    await severity(Severity.NORMAL);
+
     // Apply Active filter
     await todoPageCleanState.clickFilterActive();
 
@@ -19,6 +25,8 @@ test.describe("ToDo App - Filter Tasks", () => {
   });
 
   test("Filter by Completed tasks", async ({ todoPageCleanState }) => {
+    await severity(Severity.NORMAL);
+
     // Apply Completed filter
     await todoPageCleanState.clickFilterCompleted();
 
@@ -29,6 +37,8 @@ test.describe("ToDo App - Filter Tasks", () => {
   });
 
   test("Filter by All tasks", async ({ todoPageCleanState }) => {
+    await severity(Severity.NORMAL);
+
     await todoPageCleanState.clickFilterActive();
 
     // Switch back to All — every task must be visible again
