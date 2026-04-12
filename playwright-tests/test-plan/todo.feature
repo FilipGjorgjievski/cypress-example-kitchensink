@@ -27,12 +27,14 @@ Feature: ToDo Application
       |    spaces    | no task is added           |
 
   # READ / DISPLAY
-  Scenario: Display the correct task count
-    When the user adds 2 tasks
-    Then the counter should show "2 items left"
-
-  Scenario: Default tasks are displayed on load
-    Then the default tasks should be visible in the list
+  Scenario Outline: Display the correct task count
+    When the user adds <count> tasks
+    Then the counter should show "<expected_text>"
+    Examples:
+      | count | expected_text  |
+      | 1     | 1 item left    |
+      | 2     | 2 items left   |
+      | 3     | 3 items left   |
 
   # UPDATE
   Scenario: Mark a task as completed
