@@ -1,5 +1,5 @@
-import { test, expect } from "../fixtures/fixtures";
-import { multipleTasks, invalidTaskInputs } from "../utils/testData";
+import { test } from "../fixtures/fixtures";
+import { TASKS } from "../utils/testData";
 import { epic, feature, Severity, severity } from "allure-js-commons";
 
 test.describe("ToDo App - Create tasks", () => {
@@ -11,25 +11,25 @@ test.describe("ToDo App - Create tasks", () => {
   test("Add single new task", async ({ todoPageCleanState }) => {
     await severity(Severity.CRITICAL);
 
-    await todoPageCleanState.addTask("Fix the flux capacitor");
-    await todoPageCleanState.verifyTaskVisible("Fix the flux capacitor");
+    await todoPageCleanState.actions.addTask(TASKS.single);
+    await todoPageCleanState.expect.taskVisible(TASKS.single);
   });
 
   test("Add multiple new tasks", async ({ todoPageCleanState }) => {
     await severity(Severity.CRITICAL);
 
-    await todoPageCleanState.addMultipleTasks(multipleTasks);
-    await todoPageCleanState.expectTaskCount(multipleTasks.length);
+    await todoPageCleanState.actions.addMultipleTasks(TASKS.multiple);
+    await todoPageCleanState.expect.taskCount(TASKS.multiple.length);
   });
 
-  for (const input of invalidTaskInputs) {
+  for (const input of TASKS.invalid) {
     test(`Task input validation - input: "${input}"`, async ({
       todoPageCleanState,
     }) => {
       await severity(Severity.NORMAL);
 
-      await todoPageCleanState.addTask(input);
-      await todoPageCleanState.expectTaskCount(0);
+      await todoPageCleanState.actions.addTask(input);
+      await todoPageCleanState.expect.taskCount(0);
     });
   }
 });

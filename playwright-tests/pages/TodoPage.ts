@@ -1,35 +1,22 @@
 import { Page, Locator, expect } from "@playwright/test";
 import { BasePage } from "./BasePage";
-import { todoPath } from "../utils/constants";
+import { APP } from "../utils/constants";
 import { step } from "allure-js-commons";
 
-export class TodoPage extends BasePage {
-  private readonly newTodoInput: Locator;
-  private readonly todoItems: Locator;
-  private readonly todoCounter: Locator;
-  private readonly toggleAllButton: Locator;
-  private readonly clearCompletedButton: Locator;
-  private readonly filterAll: Locator;
-  private readonly filterActive: Locator;
-  private readonly filterCompleted: Locator;
+// ── Shared helper ──────────────────────────────────────
+function taskByName(todoItems: Locator, name: string): Locator {
+  return todoItems.filter({ hasText: name });
+}
 
-  constructor(page: Page) {
-    super(page);
-    this.newTodoInput = this.page.locator('[data-test="new-todo"]');
-    this.todoItems = this.page.locator(".todo-list").getByRole("listitem");
-    this.todoCounter = this.page.locator(".todo-count");
-    this.toggleAllButton = this.page.getByText("Mark all as complete");
-    this.clearCompletedButton = this.page.getByRole("button", {
-      name: "Clear completed",
-    });
-    this.filterAll = this.page.getByRole("link", { name: "All" });
-    this.filterActive = this.page.getByRole("link", { name: "Active" });
-    this.filterCompleted = this.page.getByRole("link", { name: "Completed" });
-  }
-
-  async open() {
-    await this.navigateTo(todoPath);
-  }
+// ── Actions ────────────────────────────────────────────
+class TodoActions {
+  constructor(
+    private page: Page,
+    private newTodoInput: Locator,
+    private todoItems: Locator,
+    private toggleAllButton: Locator,
+    private clearCompletedButton: Locator,
+  ) {}
 
   async addTask(taskName: string) {
     await step(
@@ -41,18 +28,7 @@ export class TodoPage extends BasePage {
     );
   }
 
-  async verifyTaskVisible(taskName: string) {
-    await step(
-      `Then the task "${taskName}" should appear in the list`,
-      async () => {
-        await expect(
-          this.todoItems.filter({ hasText: taskName }),
-        ).toBeVisible();
-      },
-    );
-  }
-
-  async addMultipleTasks(taskNames: string[]) {
+  async addMultipleTasks(taskNames: readonly string[]) {
     await step(`When the user adds ${taskNames.length} tasks`, async () => {
       for (const taskName of taskNames) {
         await this.newTodoInput.fill(taskName);
@@ -61,51 +37,13 @@ export class TodoPage extends BasePage {
     });
   }
 
-  async expectTaskCount(count: number) {
-    await step(
-      `Then all ${count} tasks should appear in the list`,
-      async () => {
-        await expect(this.todoItems).toHaveCount(count);
-      },
-    );
-  }
-
-  async expectCounterText(text: string) {
-    await step(`Then the counter should show "${text}"`, async () => {
-      await expect(this.todoCounter).toHaveText(text);
-    });
-  }
-
   async checkTask(taskName: string) {
     await step(
       `When the user clicks the checkbox next to "${taskName}"`,
       async () => {
-        await this.todoItems
-          .filter({ hasText: taskName })
+        await taskByName(this.todoItems, taskName)
           .getByRole("checkbox")
           .click();
-      },
-    );
-  }
-
-  async expectTaskCompleted(taskName: string) {
-    await step(
-      `Then the task "${taskName}" should be marked as completed`,
-      async () => {
-        await expect(this.todoItems.filter({ hasText: taskName })).toHaveClass(
-          "completed",
-        );
-      },
-    );
-  }
-
-  async expectTaskActive(taskName: string) {
-    await step(
-      `Then the task "${taskName}" should be marked as active`,
-      async () => {
-        await expect(
-          this.todoItems.filter({ hasText: taskName }),
-        ).not.toHaveClass("completed");
       },
     );
   }
@@ -119,54 +57,25 @@ export class TodoPage extends BasePage {
     );
   }
 
-  async expectAllTasksCompleted() {
-    await step("Then all tasks should be marked as completed", async () => {
-      const count = await this.todoItems.count();
-      for (let i = 0; i < count; i++) {
-        await expect(this.todoItems.nth(i)).toHaveClass("completed");
-      }
-    });
-  }
-
   async editTask(oldName: string, newName: string) {
     await step(
-      `When the user edites "${oldName}" to "${newName}"`,
+      `When the user edits "${oldName}" to "${newName}"`,
       async () => {
-        await this.todoItems
-          .filter({ hasText: oldName })
-          .getByText(oldName)
-          .dblclick();
-        await this.todoItems
-          .filter({ hasText: oldName })
-          .getByRole("textbox")
-          .fill(newName);
-        await this.todoItems
-          .filter({ hasText: oldName })
-          .getByRole("textbox")
-          .press("Enter");
+        const task = taskByName(this.todoItems, oldName);
+        await task.getByText(oldName).dblclick();
+        const editor = task.getByRole("textbox");
+        await editor.fill(newName);
+        await editor.press("Enter");
       },
     );
   }
 
   async deleteTask(taskName: string) {
     await step(`When the user deletes the task "${taskName}"`, async () => {
-      await this.todoItems.filter({ hasText: taskName }).hover();
-      await this.todoItems
-        .filter({ hasText: taskName })
-        .getByRole("button")
-        .click();
+      const task = taskByName(this.todoItems, taskName);
+      await task.hover();
+      await task.getByRole("button").click();
     });
-  }
-
-  async expectTaskNotVisible(taskName: string) {
-    await step(
-      `Then the task "${taskName}" should no longer appear in the list`,
-      async () => {
-        await expect(this.todoItems.filter({ hasText: taskName })).toHaveCount(
-          0,
-        );
-      },
-    );
   }
 
   async clearCompleted() {
@@ -175,25 +84,102 @@ export class TodoPage extends BasePage {
     });
   }
 
-  async clickFilterActive() {
-    await step("When the user clicks the 'Active' filer", async () => {
-      await this.filterActive.click();
+  async clickFilter(filter: "All" | "Active" | "Completed") {
+    await step(`When the user clicks the '${filter}' filter`, async () => {
+      await this.page.getByRole("link", { name: filter }).click();
     });
   }
 
-  async clickFilterCompleted() {
-    await step("When the user clicks the 'Completed' filter", async () => {
-      await this.filterCompleted.click();
+  async clearAllTasks() {
+    await step(
+      "And the default tasks are removed to ensure a clean state",
+      async () => {
+        const count = await this.todoItems.count();
+        for (let i = 0; i < count; i++) {
+          // Always target first() because the list shrinks after each deletion
+          const firstItem = this.todoItems.first();
+          await firstItem.hover();
+          await firstItem.getByRole("button").click();
+        }
+      },
+    );
+  }
+}
+
+// ── Assertions ─────────────────────────────────────────
+class TodoAssertions {
+  constructor(
+    private todoItems: Locator,
+    private todoCounter: Locator,
+  ) {}
+
+  async taskVisible(taskName: string) {
+    await step(
+      `Then the task "${taskName}" should appear in the list`,
+      async () => {
+        await expect(taskByName(this.todoItems, taskName)).toBeVisible();
+      },
+    );
+  }
+
+  async taskNotVisible(taskName: string) {
+    await step(
+      `Then the task "${taskName}" should no longer appear in the list`,
+      async () => {
+        await expect(taskByName(this.todoItems, taskName)).toHaveCount(0);
+      },
+    );
+  }
+
+  async taskCount(count: number) {
+    await step(
+      `Then all ${count} tasks should appear in the list`,
+      async () => {
+        await expect(this.todoItems).toHaveCount(count);
+      },
+    );
+  }
+
+  async counterText(text: string) {
+    await step(`Then the counter should show "${text}"`, async () => {
+      await expect(this.todoCounter).toHaveText(text);
     });
   }
 
-  async clickFilterAll() {
-    await step("When the user clicks the 'All' filter", async () => {
-      await this.filterAll.click();
+  async taskCompleted(taskName: string) {
+    await step(
+      `Then the task "${taskName}" should be marked as completed`,
+      async () => {
+        await expect(taskByName(this.todoItems, taskName)).toHaveClass(
+          /completed/,
+        );
+      },
+    );
+  }
+
+  async taskActive(taskName: string) {
+    await step(
+      `Then the task "${taskName}" should be marked as active`,
+      async () => {
+        await expect(taskByName(this.todoItems, taskName)).not.toHaveClass(
+          /completed/,
+        );
+      },
+    );
+  }
+
+  async allTasksCompleted() {
+    await step("Then all tasks should be marked as completed", async () => {
+      const count = await this.todoItems.count();
+      // toHaveClass on a multi-element locator expects an array — one pattern per item
+      await expect(this.todoItems).toHaveClass(
+        Array(count).fill(/completed/),
+      );
     });
   }
 
-  async expectTaskCountSoft(count: number) {
+  // ── Soft assertions ──
+  async taskCountSoft(count: number) {
     await step(
       `Then the task list should have ${count} tasks (soft check)`,
       async () => {
@@ -202,14 +188,43 @@ export class TodoPage extends BasePage {
     );
   }
 
-  async verifyTaskVisibleSoft(taskName: string) {
+  async taskVisibleSoft(taskName: string) {
     await step(
       `Then the task "${taskName}" should appear in the list (soft check)`,
       async () => {
-        await expect.soft(
-          this.todoItems.filter({ hasText: taskName }),
-        ).toBeVisible();
+        await expect.soft(taskByName(this.todoItems, taskName)).toBeVisible();
       },
     );
+  }
 }
+
+// ── Page Object ────────────────────────────────────────
+export class TodoPage extends BasePage {
+  readonly actions: TodoActions;
+  readonly expect: TodoAssertions;
+
+  constructor(page: Page) {
+    super(page);
+
+    const newTodoInput = page.locator('[data-test="new-todo"]');
+    const todoItems = page.locator(".todo-list").getByRole("listitem");
+    const todoCounter = page.locator(".todo-count");
+    const toggleAllButton = page.getByText("Mark all as complete");
+    const clearCompletedButton = page.getByRole("button", {
+      name: "Clear completed",
+    });
+
+    this.actions = new TodoActions(
+      page,
+      newTodoInput,
+      todoItems,
+      toggleAllButton,
+      clearCompletedButton,
+    );
+    this.expect = new TodoAssertions(todoItems, todoCounter);
+  }
+
+  async open() {
+    await this.navigateTo(APP.paths.todo);
+  }
 }

@@ -17,6 +17,8 @@ export abstract class BasePage {
   }
 
   async reloadPage() {
-    await this.page.reload();
+    await step("When the user reloads the page", async () => {
+      await this.page.reload();
+    });
   }
 }

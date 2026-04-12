@@ -1,8 +1,5 @@
 import { test } from "../fixtures/fixtures";
-import {
-  multipleTasks,
-  counterTestCases,
-} from "playwright-tests/utils/testData";
+import { TASKS, counterTestCases } from "../utils/testData";
 import { epic, feature, Severity, severity } from "allure-js-commons";
 
 test.describe("ToDo App - Read / Display", async () => {
@@ -16,10 +13,10 @@ test.describe("ToDo App - Read / Display", async () => {
       await severity(Severity.NORMAL);
 
       // Take only the first 'taskCount' tasks from the shared array
-      await todoPageCleanState.addMultipleTasks(
-        multipleTasks.slice(0, taskCount),
+      await todoPageCleanState.actions.addMultipleTasks(
+        TASKS.multiple.slice(0, taskCount),
       );
-      await todoPageCleanState.expectCounterText(expectedText);
+      await todoPageCleanState.expect.counterText(expectedText);
     });
   }
 });

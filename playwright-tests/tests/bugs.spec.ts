@@ -31,16 +31,16 @@ test.describe("ToDo App - Bug Reports", async () => {
     await severity(Severity.NORMAL);
 
     // Steps 1-3: Open fresh session → list should be empty but has 2 hardcoded tasks
-    await todoPageWithDefaults.expectTaskCountSoft(0);
+    await todoPageWithDefaults.expect.taskCountSoft(0);
 
     // Steps 4-5: Delete both default tasks and refresh the page
-    await todoPageWithDefaults.deleteTask("Pay electric bill");
-    await todoPageWithDefaults.deleteTask("Walk the dog");
-    await todoPageWithDefaults.expectTaskCount(0);
+    await todoPageWithDefaults.actions.deleteTask("Pay electric bill");
+    await todoPageWithDefaults.actions.deleteTask("Walk the dog");
+    await todoPageWithDefaults.expect.taskCount(0);
 
     // Step 6: After refresh, tasks should stay deleted
     await todoPageWithDefaults.reloadPage();
-    await todoPageWithDefaults.expectTaskCount(0);
+    await todoPageWithDefaults.expect.taskCount(0);
   });
 
   // BUG: Double-click edit mode is broken on the second default task "Walk the dog"
@@ -51,15 +51,18 @@ test.describe("ToDo App - Bug Reports", async () => {
     await severity(Severity.CRITICAL);
 
     // Control test: "Pay electric bill" enters edit mode successfully (steps 3-4)
-    await todoPageWithDefaults.editTask(
+    await todoPageWithDefaults.actions.editTask(
       "Pay electric bill",
       "Pay electric bill edited",
     );
-    await todoPageWithDefaults.verifyTaskVisible("Pay electric bill edited");
+    await todoPageWithDefaults.expect.taskVisible("Pay electric bill edited");
 
     // Bug: "Walk the dog" does not enter edit mode (steps 5-6)
-    await todoPageWithDefaults.editTask("Walk the dog", "Walk the dog edited");
-    await todoPageWithDefaults.verifyTaskVisible("Walk the dog edited");
+    await todoPageWithDefaults.actions.editTask(
+      "Walk the dog",
+      "Walk the dog edited",
+    );
+    await todoPageWithDefaults.expect.taskVisible("Walk the dog edited");
   });
 
   // BUG: "Toggle All" skips the second default task "Walk the dog"
@@ -70,13 +73,13 @@ test.describe("ToDo App - Bug Reports", async () => {
     await severity(Severity.NORMAL);
 
     // Step 3: Add a new task to verify toggle works on user-created tasks
-    await todoPageWithDefaults.addTask("Buy a milk");
+    await todoPageWithDefaults.actions.addTask("Buy a milk");
 
     // Step 4: Click "Toggle All"
-    await todoPageWithDefaults.markAllCompleted();
+    await todoPageWithDefaults.actions.markAllCompleted();
 
     // Step 5: All tasks should be completed — "Walk the dog" will fail
-    await todoPageWithDefaults.expectAllTasksCompleted();
+    await todoPageWithDefaults.expect.allTasksCompleted();
   });
 
   // BUG: Checking "Walk the dog" also checks "Pay electric bill"
@@ -87,10 +90,10 @@ test.describe("ToDo App - Bug Reports", async () => {
     await severity(Severity.NORMAL);
 
     // Step 4: Check only "Walk the dog"
-    await todoPageWithDefaults.checkTask("Walk the dog");
+    await todoPageWithDefaults.actions.checkTask("Walk the dog");
 
     // Step 5: Only "Walk the dog" should be completed
-    await todoPageWithDefaults.expectTaskActive("Pay electric bill");
+    await todoPageWithDefaults.expect.taskActive("Pay electric bill");
   });
 
   // BUG: Completing "Walk the dog" is not registered by the filter system
@@ -101,14 +104,14 @@ test.describe("ToDo App - Bug Reports", async () => {
     await severity(Severity.CRITICAL);
 
     // Step 3: Mark "Walk the dog" as done
-    await todoPageWithDefaults.checkTask("Walk the dog");
+    await todoPageWithDefaults.actions.checkTask("Walk the dog");
 
     // Step 5: Should appear under "Completed" filter
-    await todoPageWithDefaults.clickFilterCompleted();
-    await todoPageWithDefaults.verifyTaskVisibleSoft("Walk the dog");
+    await todoPageWithDefaults.actions.clickFilter("Completed");
+    await todoPageWithDefaults.expect.taskVisibleSoft("Walk the dog");
 
     // Step 6: Should NOT appear under "Active" filter
-    await todoPageWithDefaults.clickFilterActive();
-    await todoPageWithDefaults.expectTaskNotVisible("Walk the dog");
+    await todoPageWithDefaults.actions.clickFilter("Active");
+    await todoPageWithDefaults.expect.taskNotVisible("Walk the dog");
   });
 });

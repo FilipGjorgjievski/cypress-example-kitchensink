@@ -1,226 +1,131 @@
-# Kitchen Sink [![renovate-app badge][renovate-badge]][renovate-app] [![semantic-release][semantic-image] ][semantic-url]
+# ToDo App - Playwright Test Suite
 
-This is an example app used to showcase [Cypress.io](https://www.cypress.io/) End-to-End (E2E) testing. The application demonstrates the use of most [Cypress API commands](https://on.cypress.io/api). Additionally this example app is configured to run E2E tests in various CI platforms.
-Several workflows demonstrate the CI use of [Cypress Docker images](https://github.com/cypress-io/cypress-docker-images) which provide convenient, pre-configured compatible environments for Cypress.
-The [tests](https://github.com/cypress-io/cypress-example-kitchensink/tree/master/cypress/e2e) are also heavily commented.
+Automated end-to-end test suite for a ToDo application, built with [Playwright](https://playwright.dev/) and the Page Object Model (POM) pattern.
 
-To see the kitchen sink application, and to view the [Cypress API commands](https://on.cypress.io/api) demonstrated by the app, visit [example.cypress.io](https://example.cypress.io/).
+## Project Structure
 
-For a full reference of our documentation, go to [docs.cypress.io](https://docs.cypress.io/).
-
-For an example payment application demonstrating real-world usage of Cypress.io End-to-End (E2E) testing, go to the [cypress-io/cypress-realworld-app](https://github.com/cypress-io/cypress-realworld-app) repository.
-
-[renovate-badge]: https://img.shields.io/badge/renovate-enabled-brightgreen.svg?logo=renovatebot
-[renovate-app]: https://renovatebot.com/
-[semantic-image]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
-[semantic-url]: https://github.com/semantic-release/semantic-release
-
-## CI Status
-
-The following table lists live workflows from various CI providers. These each independently test the contents of this example repository. They run and record using [Cypress Cloud](https://on.cypress.io/guides/cloud/introduction) with their results displaying centrally under Cypress Cloud [ProjectId `4b7344`](https://cloud.cypress.io/#/projects/4b7344/runs). Each CI provider shows its build status on its own site:
-
-| CI Provider                                            | Workflow                                       | Build Status                                                            |   Docker example   |
-| :----------------------------------------------------- | :--------------------------------------------- | :---------------------------------------------------------------------- | :----------------: |
-| [AppVeyor][AppVeyor docs]                              | [appveyor.yml][AppVeyor workflow]              | [![AppVeyor CI][AppVeyor badge]][AppVeyor log]                          |                    |
-| [CircleCI][CircleCi docs]                              | [.circleci/config.yml][CircleCI workflow]      | [![CircleCI][CircleCI badge]][CircleCI log]                             | :white_check_mark: |
-| [**cypress-io/github-action**][Cy GitHub Actions docs] | [using-action.yml][Cy GitHub Actions workflow] | [![Cypress GHA status][Cy GitHub Actions badge]][Cy GitHub Actions log] |                    |
-| [GitHub Actions][GHA docs]                             | [single.yml][GHA workflow single]              | [![Single tests status][GHA badge single]][GHA log single]              |                    |
-| [GitHub Actions][GHA docs]                             | [parallel.yml][GHA workflow parallel]          | [![Parallel tests status][GHA badge parallel]][GHA log parallel]        |                    |
-
-<!-- CI provider links -->
-[AppVeyor docs]:            https://www.appveyor.com/docs/
-[AppVeyor badge]:           https://ci.appveyor.com/api/projects/status/bo4x59pha1eb18de/branch/master?svg=true
-[AppVeyor log]:             https://ci.appveyor.com/project/cypress-io/cypress-example-kitchensink
-[AppVeyor workflow]:        appveyor.yml
-
-[CircleCI docs]:            https://circleci.com/docs/
-[CircleCI badge]:           https://circleci.com/gh/cypress-io/cypress-example-kitchensink/tree/master.svg?style=shield
-[CircleCI log]:             https://circleci.com/gh/cypress-io/cypress-example-kitchensink/tree/master
-[CircleCI workflow]:        .circleci/config.yml
-
-[Cy GitHub Actions docs]:   https://github.com/cypress-io/github-action#readme
-[Cy GitHub Actions badge]:  https://github.com/cypress-io/cypress-example-kitchensink/actions/workflows/using-action.yml/badge.svg
-[Cy GitHub Actions log]:    https://github.com/cypress-io/cypress-example-kitchensink/actions/workflows/using-action.yml?query=branch%3Amaster
-[Cy GitHub Actions workflow]:  .github/workflows/using-action.yml
-
-[GHA docs]:      https://docs.github.com/en/actions
-[GHA badge single]:     https://github.com/cypress-io/cypress-example-kitchensink/actions/workflows/single.yml/badge.svg
-[GHA badge parallel]:     https://github.com/cypress-io/cypress-example-kitchensink/actions/workflows/parallel.yml/badge.svg
-[GHA log single]:       https://github.com/cypress-io/cypress-example-kitchensink/actions/workflows/single.yml?query=branch%3Amaster
-[GHA log parallel]:       https://github.com/cypress-io/cypress-example-kitchensink/actions/workflows/parallel.yml?query=branch%3Amaster
-[GHA workflow single]:  .github/workflows/single.yml
-[GHA workflow parallel]:  .github/workflows/parallel.yml
-
-You can find all CI results recorded on the Cypress Cloud
-[![Cypress Cloud](https://img.shields.io/endpoint?url=https://cloud.cypress.io/badge/simple/4b7344/master&style=flat&logo=cypress)](https://cloud.cypress.io/projects/4b7344/runs)
-
-## CI Workflow Examples
-
-This table shows additional examples of CI workflows. With the exception of GitHub Actions workflows, these are **not** live examples as in the table above and they may require modification before use. The GitHub Actions workflows are live and they run without recording to Cypress Cloud.
-
-| CI Provider                                           | Basic Config                                             | Full Parallel Config                                 |   Docker example   |
-| :---------------------------------------------------- | :------------------------------------------------------- | :--------------------------------------------------- | :----------------: |
-| [AWS Amplify][AWS Amplify docs]                       | [amplify.yml](amplify.yml)                               |                                                      |                    |
-| [AWS CodeBuild][AWS CodeBuild docs]                   | [basic/buildspec.yml](./basic/buildspec.yml)             | [buildspec.yml](buildspec.yml)                       |                    |
-| [Azure Pipelines][Azure Pipelines docs]               | [basic/azure-ci.yml](basic/azure-ci.yml)                 | [azure-ci.yml](azure-ci.yml)                         |                    |
-| [Buddy.works][Buddy.works docs]                       | [buddy.yml](buddy.yml)                                   |                                                      | :white_check_mark: |
-| [Buildkite][Buildkite docs]                           | [.buildkite/pipeline.yml](.buildkite/pipeline.yml)       |                                                      |                    |
-| [CircleCI][CircleCi docs]                             | [basic/.circleci/config.yml](basic/.circleci/config.yml) |                                                      | :white_check_mark: |
-| [GitHub Actions][GHA docs]                            | [chrome.yml](.github/workflows/chrome.yml)               |                                                      |                    |
-| [GitHub Actions][GHA docs]                            | [chrome-docker.yml](.github/workflows/chrome-docker.yml) |                                                      | :white_check_mark: |
-| [GitLab][GitLab docs]                                 | [basic/.gitlab-ci.yml](basic/.gitlab-ci.yml)             | [.gitlab-ci.yml](.gitlab-ci.yml)                     | :white_check_mark: |
-| [Jenkins][Jenkins docs]                               | [basic/Jenkinsfile](basic/Jenkinsfile)                   | [Jenkinsfile](Jenkinsfile)                           | :white_check_mark: |
-| [Semaphore 2.0][Semaphore 2.0 docs]                   | [basic/.semaphore.yml](basic/.semaphore.yml)             | [.semaphore/semaphore.yml](.semaphore/semaphore.yml) |                    |
-| [Travis CI][Travis CI docs]                           | [basic/.travis.yml](basic/.travis.yml)                   | [.travis.yml](.travis.yml)                           |                    |
-
-<!-- CI provider doc links -->
-[AWS Amplify docs]:             https://docs.amplify.aws/
-[AWS CodeBuild docs]:           https://docs.aws.amazon.com/codebuild/
-[Azure Pipelines docs]:         https://learn.microsoft.com/en-us/azure/devops/pipelines/
-[Buddy.works docs]:             https://buddy.works/docs
-[Buildkite docs]:               https://buildkite.com/docs
-[GitLab docs]:                  https://docs.gitlab.com/ee/ci/yaml/
-[Jenkins docs]:                 https://www.jenkins.io/doc/
-[Semaphore 2.0 docs]:           https://docs.semaphoreci.com/
-[Travis CI docs]:               https://docs.travis-ci.com/
-
-The Cypress documentation page [CI Provider Examples](https://docs.cypress.io/guides/continuous-integration/ci-provider-examples) provides some more examples with extensive guides for using Cypress with some of the most popular CI providers.
-
-## Run Tests
-
-### Local testing
-
-To run the tests from this repo on your local machine, first make sure your machine meets the [Cypress System Requirements](https://on.cypress.io/guides/getting-started/installing-cypress#System-requirements), including the installation of [Node.js](https://docs.cypress.io/guides/getting-started/installing-cypress#Installing-Nodejs) according to the version specified in the file [.node-version](./.node-version).
-
-Executing the following instructions will clone the repository, install dependencies and run Cypress:
-
-```shell
-git clone https://github.com/cypress-io/cypress-example-kitchensink.git
-cd cypress-example-kitchensink
-npm ci # install dependencies
-npm run local:run # run Cypress headlessly
+```
+playwright-tests/
+  fixtures/
+    fixtures.ts          # Custom test fixtures (clean state & default state)
+  pages/
+    BasePage.ts          # Abstract base class with shared navigation methods
+    TodoPage.ts          # Page object split into Actions and Assertions
+  tests/
+    create.spec.ts       # Task creation tests
+    read.spec.ts         # Task display and counter tests
+    update.spec.ts       # Task completion, unchecking, and editing tests
+    delete.spec.ts       # Task deletion and clear completed tests
+    filter.spec.ts       # Active, Completed, and All filter tests
+    bugs.spec.ts         # Known bug documentation with reproducible test cases
+  test-plan/
+    todo.feature         # BDD test plan in Gherkin syntax
+  utils/
+    constants.ts         # Application URLs and paths
+    testData.ts          # Centralized test data and expected values
+playwright.config.ts     # Playwright configuration with Allure reporting
 ```
 
-`local:run` is a [package.json](./package.json) script that starts a local webserver and then uses [cypress run](https://on.cypress.io/command-line#cypress-run) to run Cypress headlessly.
-If you would like to run Cypress tests interactively, then run the following command which uses [cypress open](https://on.cypress.io/command-line#cypress-open) to run Cypress in headed mode. You can pick individual tests to run.
+## Tech Stack
 
-```shell
-npm run local:open
+- **Playwright** - Browser automation and test runner
+- **TypeScript** - Type-safe test code
+- **Allure** - Step-level reporting with screenshots and traces
+- **Page Object Model** - Actions/Assertions separation for readability
+
+## Prerequisites
+
+- Node.js (v18 or higher)
+- npm
+- Java (JDK 8+) — required for Allure report generation
+
+## Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Install Playwright browsers
+npx playwright install
 ```
 
-As an alternative to using the `local:open` and `local:run` scripts, you can also start the server in one step and then run Cypress in a second step.
+## Running Tests
 
-```shell
-npm start # start server on port 8080
+The `webServer` option in `playwright.config.ts` automatically starts the app (`npm start` on `http://localhost:8080`) before tests and stops it after. If you already have the server running locally, Playwright reuses it instead of starting a second one.
+
+```bash
+# Run all tests (auto-starts the app server)
+npx playwright test
+
+# Run in headed mode (visible browser)
+npx playwright test --headed
+
+# Run a specific test file
+npx playwright test create.spec.ts
+
+# Run bug report tests with multiple iterations for reliable reproduction
+npx playwright test bugs.spec.ts --headed --repeat-each=5
 ```
 
-You can check that the server is running if you open a web browser and navigate to `http://localhost:8080`.
+## Test Reports
 
-Then in a separate terminal window execute either
+On failure, Playwright automatically captures **screenshots**, **videos**, and **traces** for debugging (configured in `playwright.config.ts`).
 
-```shell
-npx cypress run # for headless mode
+```bash
+# Generate Allure report from test results
+npx allure generate allure-results --clean -o allure-report
+
+# Open the report in your browser
+npx allure open allure-report
+
+# View a trace file from a failed test
+npx playwright show-trace test-results/<test-folder>/trace.zip
 ```
 
-or
+## Test Fixtures
 
-```shell
-npx cypress open # for headed interactive mode
+The suite uses two custom fixtures to handle the app's default state:
+
+- **`todoPageCleanState`** - Opens the app and removes all pre-existing tasks, giving each test a guaranteed empty starting state.
+- **`todoPageWithDefaults`** - Opens the app without clearing tasks, preserving the hardcoded default tasks for bug-report tests.
+
+## Page Object Architecture
+
+`TodoPage` separates user interactions from verifications using namespaced accessors:
+
+```typescript
+// Actions — what the user does
+await todoPage.actions.addTask("Buy milk");
+await todoPage.actions.checkTask("Buy milk");
+await todoPage.actions.clickFilter("Active");
+
+// Assertions — what we verify
+await todoPage.expect.taskVisible("Buy milk");
+await todoPage.expect.taskCompleted("Buy milk");
+await todoPage.expect.taskCount(3);
 ```
 
-#### Script and server structure
+## Test Coverage
 
-The scripts `local:run` and `local:open` use the `start-test` alias of the npm module [start-server-and-test](https://www.npmjs.com/package/start-server-and-test) to run [./scripts/start.js](./scripts/start.js), which starts the webserver, waits for it to become ready, and then launches Cypress.
+| Category | Tests | Coverage |
+|----------|-------|---------|
+| Create   | 4     | Add single/multiple tasks, input validation (empty, spaces) |
+| Read     | 3     | Counter text for 1, 2, and 3 active tasks |
+| Update   | 4     | Mark complete, unmark, edit task, mark all complete |
+| Delete   | 2     | Delete single task, clear all completed |
+| Filter   | 3     | Filter by Active, Completed, and All |
+| Bugs     | 5     | Documented application defects with GitHub Issue references |
 
-The `start` script spawns a webserver using the npm module [serve](https://www.npmjs.com/package/serve) and displays the Kitchen Sink App on port `8080`.
+**Total: 21 test cases**
 
-### Docker testing
+## Known Bugs
 
-If you have Docker installed locally, for instance using [Docker Desktop](https://docs.docker.com/desktop/), you can run the tests from this repo interactively in a Docker container.
-Use [Cypress Docker images](https://github.com/cypress-io/cypress-docker-images), which are built with all the prerequisites for running Cypress. They are available as [base](https://github.com/cypress-io/cypress-docker-images/tree/master/base), [browsers](https://github.com/cypress-io/cypress-docker-images/tree/master/browsers) and [included](https://github.com/cypress-io/cypress-docker-images/tree/master/included) options from [Docker Hub](https://hub.docker.com/u/cypress) and the [Amazon ECR (Elastic Container Registry) Public Gallery](https://gallery.ecr.aws/cypress-io).
+The `bugs.spec.ts` file documents known application defects. These tests are expected to fail as they reproduce real bugs:
 
-As above, start by cloning the repo and installing dependencies:
+1. App initializes with hardcoded tasks instead of an empty list
+2. Double-click edit mode is broken on the second default task
+3. "Toggle All" skips the second default task
+4. Checking one task inadvertently checks another
+5. Completed default task not registered by the filter system
 
-```shell
-git clone https://github.com/cypress-io/cypress-example-kitchensink
-cd cypress-example-kitchensink
-npm ci
-```
-
-NOTE: For simplicity, the Docker examples below use a repository reference such as `cypress/base` with the `latest` version tag. To select an earlier version, replace `latest` with an explicit tag, for example `cypress/base:20.15.1`. Explicit version tags are recommended for production. Usage is further explained in the [Tags](https://github.com/cypress-io/cypress-docker-images/blob/master/README.md#tags) section of the [Cypress Docker Images - README](https://github.com/cypress-io/cypress-docker-images/blob/master/README.md).
-
-#### cypress/base
-
-The following example uses a [cypress/base](https://github.com/cypress-io/cypress-docker-images/tree/master/base) image which itself contains no browsers. You will use the Electron browser bundled with Cypress instead. To run the Docker container, execute the following:
-
-```shell
-docker run -it --rm -v .:/app -w /app cypress/base:latest
-```
-
-When the container prompt appears, enter:
-
-```shell
-npx cypress install     # install Cypress binary
-npm run test:ci         # start server and run tests in Electron browser
-exit
-```
-
-#### cypress/browsers
-
-With a [cypress/browsers](https://github.com/cypress-io/cypress-docker-images/tree/master/browsers) image you have the additional choice of Chrome, Edge and Firefox browsers. Execute the following:
-
-```shell
-docker run -it --rm -v .:/app -w /app cypress/browsers:latest
-```
-
-When the container prompt appears, enter:
-
-```shell
-npx cypress install     # install Cypress binary
-npm run test:ci         # start server and run tests in Electron browser
-npm run test:ci:chrome  # start server and run tests in Chrome browser
-npm run test:ci:edge    # start server and run tests in Edge browser
-npm run test:ci:firefox # start server and run tests in Firefox browser
-exit
-```
-
-#### cypress/included
-
-The [cypress/included](https://github.com/cypress-io/cypress-docker-images/tree/master/included) images add a full Cypress installation compared to [cypress/browsers](https://github.com/cypress-io/cypress-docker-images/tree/master/browsers).
-Execute the following to run the container with a one-line command, testing with the Chrome browser:
-
-```shell
-docker run -it --rm -v .:/app -w /app --entrypoint bash cypress/included:latest -c 'npm run test:ci:chrome' # use for matching Cypress versions
-```
-
-Replace the `latest` tag in the above command using the Cypress version from the repo's [package.json](./package.json), if this repository has not yet been updated to the latest released Cypress version.
-Note that mismatched versions will cause errors.
-
-NOTE: Additional browsers Chrome, Edge and Firefox are installed in `linux/amd64` architecture images `cypress/browsers` and `cypress/included`.
-Firefox is available pre-installed for `linux/arm64` architecture images based on Firefox `>=136.0.2`.
-Refer to the [Cypress Docker images README](https://github.com/cypress-io/cypress-docker-images/blob/master/README.md#browsers) for details.
-The Electron browser, which is built-in to Cypress, is available in all images and architectures.
-
-### CI Testing
-
-If you would like to try out running tests in a Continuous Integration (CI) provider then you need to first [fork the repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) so that you have your own copy. Refer to the [GitHub documentation](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo#configuring-git-to-sync-your-fork-with-the-upstream-repository) to set up aliases for `remote upstream` (to this repo) and `remote origin` (to your fork) correctly.
-You will also need to have an account with the CI provider you want to test with.
-
-## Documentation
-
-- Use the [Cypress Documentation](https://on.cypress.io) for instructions on how to use Cypress
-- Read the [Command Line Guide](https://on.cypress.io/command-line) for run options
-- Refer to the [API](https://on.cypress.io/api/) documents to understand the Cypress API calls tested in this repo
-- Read [Installing Cypress](https://on.cypress.io/installing-cypress) for step-by-step information on installing Cypress in your own project
-
-## Support
-
-- For "how-to" questions and discussions, go to the Cypress [Discord Chat](https://on.cypress.io/discord) and be part of the worldwide user community!
-
-## Contributing
-
-Check out the [Contributing Guideline](./CONTRIBUTING.md).
-
-## Changelog
-
-See [Releases](https://github.com/cypress-io/cypress-example-kitchensink/releases).
+Each test references its corresponding GitHub Issue for full bug report details.
