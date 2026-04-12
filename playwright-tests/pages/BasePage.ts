@@ -1,18 +1,22 @@
-import { Page } from '@playwright/test';
-import { step } from 'allure-js-commons';
+import { Page } from "@playwright/test";
+import { step } from "allure-js-commons";
 
 export abstract class BasePage {
-    protected page: Page;
+  protected page: Page;
 
-    constructor(page: Page) {
-        this.page = page;
-    }
+  constructor(page: Page) {
+    this.page = page;
+  }
 
-    abstract open(): Promise<void>;
+  abstract open(): Promise<void>;
 
-    async navigateTo(path: string): Promise<void> {
-        await step(`Given the user navigates to "${path}"`, async () => {
-            await this.page.goto(path);
-        })
-    }
+  async navigateTo(path: string) {
+    await step(`Given the user navigates to "${path}"`, async () => {
+      await this.page.goto(path);
+    });
+  }
+
+  async reloadPage() {
+    await this.page.reload();
+  }
 }

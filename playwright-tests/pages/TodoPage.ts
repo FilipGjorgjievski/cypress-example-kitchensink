@@ -192,4 +192,24 @@ export class TodoPage extends BasePage {
       await this.filterAll.click();
     });
   }
+
+  async expectTaskCountSoft(count: number) {
+    await step(
+      `Then the task list should have ${count} tasks (soft check)`,
+      async () => {
+        await expect.soft(this.todoItems).toHaveCount(count);
+      },
+    );
+  }
+
+  async verifyTaskVisibleSoft(taskName: string) {
+    await step(
+      `Then the task "${taskName}" should appear in the list (soft check)`,
+      async () => {
+        await expect.soft(
+          this.todoItems.filter({ hasText: taskName }),
+        ).toBeVisible();
+      },
+    );
+}
 }
