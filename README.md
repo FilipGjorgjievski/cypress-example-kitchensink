@@ -2,6 +2,20 @@
 
 Automated end-to-end test suite for a ToDo application, built with [Playwright](https://playwright.dev/) and the Page Object Model (POM) pattern.
 
+## Table of Contents
+
+- [Project Structure](#project-structure)
+- [Tech Stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Setup](#setup)
+- [Docker (Run Without Local Setup)](#docker-run-without-local-setup)
+- [Running Tests](#running-tests)
+- [Test Reports](#test-reports)
+- [Test Fixtures](#test-fixtures)
+- [Page Object Architecture](#page-object-architecture)
+- [Test Coverage](#test-coverage)
+- [Known Bugs](#known-bugs)
+
 ## Project Structure
 
 ```
@@ -24,6 +38,8 @@ playwright-tests/
     constants.ts         # Application URLs and paths
     testData.ts          # Centralized test data and expected values
 playwright.config.ts     # Playwright configuration with Allure reporting
+Dockerfile               # Containerized test execution (app + tests + dependencies)
+.dockerignore            # Files excluded from the Docker build context
 ```
 
 ## Tech Stack
@@ -32,6 +48,7 @@ playwright.config.ts     # Playwright configuration with Allure reporting
 - **TypeScript** - Type-safe test code
 - **Allure** - Step-level reporting with screenshots and traces
 - **Page Object Model** - Actions/Assertions separation for readability
+- **Docker** - Containerized test execution with no local setup required
 
 ## Prerequisites
 
@@ -48,6 +65,61 @@ npm install
 # Install Playwright browsers
 npx playwright install
 ```
+
+## Docker (Run Without Local Setup)
+
+The project includes a Dockerfile that packages the app, tests, and all dependencies (including browsers) into a single image. No local setup required — just Docker.
+
+### Build the Image
+
+```bash
+docker build -t todo-tests .
+```
+
+- `docker build` — reads the Dockerfile and creates an image step by step
+- `-t todo-tests` — tags (names) the image as `todo-tests` for easy reference
+- `.` — tells Docker to look for the Dockerfile in the current directory (the build context)
+
+### Run the Tests
+
+```bash
+docker run --name test-run todo-tests
+```
+
+- `docker run` — creates and starts a new container from the specified image
+- `--name test-run` — assigns a name to the container so it can be referenced later
+- `todo-tests` — the image to run (built in the previous step)
+
+When the container starts, Playwright automatically launches the app server, waits for it to be ready, and executes the full test suite.
+
+> **Note:** Some tests in `bugs.spec.ts` are expected to fail — they intentionally reproduce known application defects documented in GitHub Issues. See [Known Bugs](#known-bugs) for details.
+
+### Extract Allure Reports
+
+Test results are generated inside the container. To view them on your machine:
+
+```bash
+docker cp test-run:/app/allure-results ./allure-results
+```
+
+- `docker cp` — copies files between a container and the host machine
+- `test-run:/app/allure-results` — source path inside the container
+- `./allure-results` — destination path on your local machine
+
+Then generate and open the report:
+
+```bash
+allure generate allure-results --clean -o allure-report
+allure open allure-report
+```
+
+### Cleanup
+
+```bash
+docker rm test-run
+```
+
+Removes the stopped container. The image (`todo-tests`) is preserved and can be reused with `docker run`.
 
 ## Running Tests
 
