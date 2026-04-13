@@ -11,11 +11,11 @@ function taskByName(todoItems: Locator, name: string): Locator {
 // ── Actions ────────────────────────────────────────────
 class TodoActions {
   constructor(
-    private page: Page,
-    private newTodoInput: Locator,
-    private todoItems: Locator,
-    private toggleAllButton: Locator,
-    private clearCompletedButton: Locator,
+    private readonly page: Page,
+    private readonly newTodoInput: Locator,
+    private readonly todoItems: Locator,
+    private readonly toggleAllButton: Locator,
+    private readonly clearCompletedButton: Locator,
   ) {}
 
   async addTask(taskName: string) {
@@ -109,8 +109,8 @@ class TodoActions {
 // ── Assertions ─────────────────────────────────────────
 class TodoAssertions {
   constructor(
-    private todoItems: Locator,
-    private todoCounter: Locator,
+    private readonly todoItems: Locator,
+    private readonly todoCounter: Locator,
   ) {}
 
   async taskVisible(taskName: string) {
