@@ -92,6 +92,20 @@ docker run --name test-run todo-tests
 
 When the container starts, Playwright automatically launches the app server, waits for it to be ready, and executes the full test suite.
 
+#### Run a specific test file
+
+To run only a specific file, append the Playwright command at the end (this overrides the default for that run only):
+
+```bash
+docker run --name test-run todo-tests npx playwright test bugs.spec.ts
+```
+
+To repeat each test multiple times (e.g. 5 times):
+
+```bash
+docker run --name test-run todo-tests npx playwright test bugs.spec.ts --repeat-each=5
+```
+
 > **Note:** Some tests in `bugs.spec.ts` are expected to fail — they intentionally reproduce known application defects documented in GitHub Issues. See [Known Bugs](#known-bugs) for details.
 
 ### Extract Allure Reports
